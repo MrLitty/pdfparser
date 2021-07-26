@@ -605,6 +605,133 @@ class PDFObject
     }
 
     /**
+     * @param Page $page
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getTextArrayWithFontDetails(Page $page = null)
+    {
+        $text = [];
+        $sections = $this->getSectionsText($this->content);
+        $current_font = new Font($this->document, null, null, $this->config);
+
+        foreach ($sections as $section) {
+            $commands = $this->getCommandsText($section);
+
+            foreach ($commands as $command) {
+                switch ($command[self::OPERATOR]) {
+                    // set character spacing
+                    case 'Tc':
+                        break;
+
+                    // move text current point
+                    case 'Td':
+                        break;
+
+                    // move text current point and set leading
+                    case 'TD':
+                        break;
+
+                    case 'Tf':
+                        if (null !== $page) {
+                            list($id, $size) = preg_split('/\s/s', $command[self::COMMAND]);
+                            $id = trim($id, '/');
+                            $current_font = $page->getFont($id);
+                        }
+                        break;
+
+                    case "'":
+                    case 'Tj':
+                        $command[self::COMMAND] = [$command];
+                        // no break
+                    case 'TJ':
+                        $sub_text = $current_font->decodeText($command[self::COMMAND]);
+                        $text[] = [$sub_text, $current_font, $size];
+                        break;
+
+                    // set leading
+                    case 'TL':
+                        break;
+
+                    case 'Tm':
+                        break;
+
+                    // set super/subscripting text rise
+                    case 'Ts':
+                        break;
+
+                    // set word spacing
+                    case 'Tw':
+                        break;
+
+                    // set horizontal scaling
+                    case 'Tz':
+                        //$text .= "\n";
+                        break;
+
+                    // move to start of next line
+                    case 'T*':
+                        //$text .= "\n";
+                        break;
+
+                    case 'Da':
+                        break;
+
+                    case 'Do':
+                        if (null !== $page) {
+                            $args = preg_split('/\s/s', $command[self::COMMAND]);
+                            $id = trim(array_pop($args), '/ ');
+                            if ($xobject = $page->getXObject($id)) {
+                                $text[] = $xobject->getText($page);
+                            }
+                        }
+                        break;
+
+                    case 'rg':
+                    case 'RG':
+                        break;
+
+                    case 're':
+                        break;
+
+                    case 'co':
+                        break;
+
+                    case 'cs':
+                        break;
+
+                    case 'gs':
+                        break;
+
+                    case 'en':
+                        break;
+
+                    case 'sc':
+                    case 'SC':
+                        break;
+
+                    case 'g':
+                    case 'G':
+                        break;
+
+                    case 'V':
+                        break;
+
+                    case 'vo':
+                    case 'Vo':
+                        break;
+
+                    default:
+                }
+            }
+        }
+
+        return $text;
+    }
+
+    /**
      * @param string $text_part
      * @param int    $offset
      *

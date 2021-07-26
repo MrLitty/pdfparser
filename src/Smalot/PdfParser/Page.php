@@ -281,6 +281,55 @@ class Page extends PDFObject
     }
 
     /**
+     * @param  Page $page
+     *
+     * @return array
+     */
+    public function getTextArrayWithFontDetails(self $page = null)
+    {
+        if ($contents = $this->get('Contents')) {
+            if ($contents instanceof ElementMissing) {
+                return [];
+            } elseif ($contents instanceof ElementNull) {
+                return [];
+            } elseif ($contents instanceof PDFObject) {
+                $elements = $contents->getHeader()->getElements();
+
+                if (is_numeric(key($elements))) {
+                    $new_content = '';
+
+                    /** @var PDFObject $element */
+                    foreach ($elements as $element) {
+                        if ($element instanceof ElementXRef) {
+                            $new_content .= $element->getObject()->getContent();
+                        } else {
+                            $new_content .= $element->getContent();
+                        }
+                    }
+
+                    $header = new Header([], $this->document);
+                    $contents = new PDFObject($this->document, $header, $new_content, $this->config);
+                }
+            } elseif ($contents instanceof ElementArray) {
+                // Create a virtual global content.
+                $new_content = '';
+
+                /** @var PDFObject $content */
+                foreach ($contents->getContent() as $content) {
+                    $new_content .= $content->getContent()."\n";
+                }
+
+                $header = new Header([], $this->document);
+                $contents = new PDFObject($this->document, $header, $new_content, $this->config);
+            }
+
+            return $contents->getTextArrayWithFontDetails($this);
+        }
+
+        return [];
+    }
+
+    /**
      * Gets all the text data with its internal representation of the page.
      *
      * @return array An array with the data and the internal representation
