@@ -1,5 +1,5 @@
 {
-    "name": "smalot/pdfparser",
+    "name": "mrlitty/pdfparser",
     "description": "Pdf parser library. Can read and extract information from pdf file.",
     "keywords": ["PDF", "text", "parser", "parse", "extract"],
     "type": "library",
@@ -8,11 +8,12 @@
         {
             "name": "Sebastien MALOT",
             "email": "sebastien@malot.fr"
+        },
+        {
+            "name": "Erik Bakker",
+            "email": "erik@epg-info.nl"
         }
     ],
-    "support": {
-        "issues": "https://github.com/smalot/pdfparser/issues"
-    },
     "homepage": "https://www.pdfparser.org",
     "require": {
         "php": ">=7.1",
