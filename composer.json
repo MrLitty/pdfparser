@@ -32,5 +32,11 @@
     },
     "config": {
         "process-timeout": 1200
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/epgweb/pdfparser.git"
+        }
+    ]
 }
